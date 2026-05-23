@@ -1,0 +1,31 @@
+name: Build Axon Roothide
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:    # 允许手动触发
+
+jobs:
+  build:
+    runs-on: macos-latest   # GitHub 提供免费的 macOS 虚拟机，自带 Xcode
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Install Theos
+      run: |
+        bash -c "$(curl -fsSL https://raw.githubusercontent.com/roothide/theos/master/bin/install-theos)"
+        echo "THEOS=$HOME/theos" >> $GITHUB_ENV
+    
+    - name: Build Package
+      run: |
+        export THEOS_PACKAGE_SCHEME=roothide
+        make package
+      env:
+        THEOS: ${{ env.THEOS }}
+    
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: Axon-Roothide-Deb
+        path: packages/*.deb
