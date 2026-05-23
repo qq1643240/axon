@@ -1,0 +1,59 @@
+name: Build Axon Roothide
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:  # 允许手动点按钮触发
+
+jobs:
+  build:
+    runs-on: macos-latest
+    
+    steps:
+    - name: Checkout source
+      uses: actions/checkout@v4
+      
+    - name: Install Theos (Roothide)
+      run: |
+        bash -c "$(curl -fsSL https://raw.githubusercontent.com/roothide/theos/master/bin/install-theos)"
+        echo "THEOS=$HOME/theos" >> $GITHUB_ENV
+        echo "THEOS_PACKAGE_SCHEME=roothide" >> $GITHUB_ENV
+        
+    - name: Setup environment
+      run: |
+        echo "Current THEOS: $THEOS"
+        ls -la $THEOS/sdks/ || echo "SDK check"
+        
+    - name: Build package
+      run: |
+        export THEOS=$HOME/theos
+        export THEOS_PACKAGE_SCHEME=roothide
+        export ARCHS="arm64 arm64e"
+        make clean
+        make package
+      env:
+        THEOS: ${{ env.THEOS }}
+        
+    - name: List output
+      run: |
+        ls -la packages/ || echo "No packages dir"
+        find . -name "*.deb" -type f
+        
+    - name: Upload deb artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: Axon-Roothide-Deb
+        path: packages/*.deb
+        if-no-files-found: error
+        
+    - name: Create Release (optional)
+      if: github.event_name == 'workflow_dispatch'
+      uses: softprops/action-gh-release@v1
+      with:
+        files: packages/*.deb
+        tag_name: v${{ github.run_number }}
+        name: Axon Roothide Build ${{ github.run_number }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
