@@ -1,0 +1,10 @@
+Package: me.nepeta.axon
+Name: Axon (Roothide)
+Depends: mobilesubstrate, firmware (>= 14.0)
+Conflicts: io.ominousness.stackxi, com.thomasfinch.priorityhub, com.ioscreatix.intelixbeta, com.ioscreatix.intelix, com.spiritoflogic.ncunify, com.spiritoflogic.unifyx, com.hidan.nclink10, org.coolstar.ventana-modern, org.coolstar.ventana, org.s1ris.spinxi
+Version: 1.5
+Architecture: iphoneos-arm64e
+Description: Priority Hub for iOS 14-16 with Roothide support + Swipe gestures
+Maintainer: Modified
+Author: Nepeta & Baw Appie
+Section: Tweaks
